@@ -6,10 +6,18 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use Test::More tests => 1;
-BEGIN { use_ok('Ipernity::API') };
+BEGIN { use_ok('Ipernity::API', 'Ipernity::API::Request') };
 
 #########################
 
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
+my $api = Ipernity::API->new(
+	'args'          => {
+		'api_key'       => '76704c8b0000271B6df755a656250e26',
+		'outputformat'  => 'xml',
+	},
+);
+my $result = $api->execute(
+	'method'        => 'test.hello',
+);
 
+exit 1 unless($result =~ m$<hello>hello world!</hello>$);
