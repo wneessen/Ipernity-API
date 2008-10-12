@@ -8,7 +8,7 @@ WriteMakefile(
     PREREQ_PM         => {
 	    'URI'		=> 0,
 	    'HTTP::Request'	=> 0,
-	    'XML::Twig'		=> 0,
+	    'XML::Simple'	=> 0,
 	    'LWP::UserAgent'	=> 0,
 	    'Digest::MD5'	=> 0,
     },

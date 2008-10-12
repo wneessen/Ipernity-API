@@ -1,10 +1,10 @@
-# Iperntiy::API::Request
+# Iperntiy::API
 #
 # Contact: doomy [at] dokuleser [dot] org
 # Copyright 2008 Winfried Neessen
 #
-# $Id: API.pm,v 1.2 2008-10-12 17:38:00 doomy Exp $
-# Last modified: [ 2008-10-12 19:36:44 ]
+# $Id: API.pm,v 1.3 2008-10-12 19:11:33 doomy Exp $
+# Last modified: [ 2008-10-12 21:05:22 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -14,7 +14,7 @@ use Carp;
 use Digest::MD5 qw(md5_hex);
 use Ipernity::API::Request;
 use LWP::UserAgent;
-use XML::Twig;
+use XML::Simple;
 
 our @ISA = qw(LWP::UserAgent);
 our $VERSION = '0.01';
@@ -92,6 +92,31 @@ sub execute_request
 }
 # }}}
 
+### Execute the API request and return a XML object / execute_xml() {{{
+sub execute_xml()
+{
+	### Get object and request
+	my $self = shift;
+	my %args = @_;
+
+	### Execute the request
+	my $response = $self->execute(%args)->{_content};
+
+	### Generate a hashref out of the XML tree
+	my $xml = new XML::Simple;
+	my $xmlresult = $xml->XMLin(
+		$response, 
+		ForceContent => 1
+	);
+
+	### Check the status of the request
+	CheckResponse($xmlresult);
+
+	### Return the xmlhash
+	return $xmlresult;
+}
+# }}}
+
 ### Sign arguments for authenticated call // signargs() {{{
 sub signargs
 {
@@ -124,20 +149,12 @@ sub fetchfrob
 	my $frob = {};
 
 	### Create an API request
-	my $response = $self->execute(
+	my $response = $self->execute_xml(
 		'method' => 'auth.getFrob',
 	);
 
-	my $xml = XML::Twig->new(
-		TwigHandlers => {
-			"/api" => \&CheckError,
-			"/api/auth/frob" => sub { $frob = $_->text; },
-		}
-	);
-	$xml->parse($response->{_content});
-
 	### Return the frob
-	return $frob;
+	return $response->{auth}->{frob}->{content};
 }
 # }}}
 
@@ -152,6 +169,11 @@ sub authurl
 	$args{frob}	= shift;
 	$args{perm_doc}	= shift;
 	$args{api_key}	= $self->{args}->{api_key};
+
+	### Set permissions to read if not set
+	unless(defined($args{perm_doc})) {
+		$args{perm_doc} = 'read';
+	}
 
 	### Sort arguments and add them to $api_sig
 	foreach my $key (sort {$a cmp $b} keys %args) {
@@ -182,46 +204,36 @@ sub authurl
 sub authtoken
 {
 	### Get object
-	my ($token);
 	my $self = shift;
 
 	### Get arguments
 	$self->{frob} = shift;
 
-	### Request the AuthToken
-	my $response = $self->execute(
+	### Create an API request
+	my $response = $self->execute_xml(
 		'method' => 'auth.getToken',
 		'frob'	 => $self->{frob},
 	);
 
-	### Process the respose
-	my $xml = XML::Twig->new(
-		TwigHandlers => {
-			"/api" => \&CheckError,
-			"/api/auth/token" => sub { $token = $_->text; },
-		}
-	);
-	$xml->parse($response->{_content});
-
 	### Return the AuthToken
-	return $token;
+	return $response->{auth}->{token}->{content};
 }
 # }}}
 
-### Check the API status code and return an error if unsuccessfull // CheckError() {{{
-sub CheckError
+### Check the API status code and return an error if unsuccessfull // CheckResponse() {{{
+sub CheckResponse
 {
-	### Get the API response
-	my ($t, $xml) = @_;
+	### Get the XML hashref
+	my $xmlhash = shift;
 
 	### Get the status;
 	my ($code, $msg);
-	my $status = $xml->{att}->{'status'};
+	my $status = $xmlhash->{'status'};
 
 	### We caught an error - let's die!
 	if(lc($status) eq 'error') {
-		$code = $xml->{att}->{'code'};
-		$msg  = $xml->{att}->{'message'};
+		$code = $xmlhash->{code};
+		$msg  = $xmlhash->{message};
 		croak("An API call caught an unexpected error: " . $msg . " (Error Code: " . $code . ")");
 	}
 
@@ -294,6 +306,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$Id: API.pm,v 1.2 2008-10-12 17:38:00 doomy Exp $
+$Id: API.pm,v 1.3 2008-10-12 19:11:33 doomy Exp $
 
 =cut

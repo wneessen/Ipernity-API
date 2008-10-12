@@ -18,7 +18,7 @@ my $api = Ipernity::API->new(
 		'outputformat'  => 'xml',
 	},
 );
-my $result = $api->execute(
+my $result = $api->execute_xml(
 	'method'        => 'test.hello',
 );
-ok($result->{_content} =~ m/hello world/, 'test.hello');
+ok($result->{hello}->{content} =~ m/hello world/, 'test.hello');
