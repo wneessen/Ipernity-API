@@ -8,7 +8,7 @@
 use Test::More tests => 2;
 use lib ( 'blib/lib' );
 
-BEGIN { use_ok('Ipernity::API', 'Ipernity::API::Request') };
+BEGIN { use_ok('Ipernity::API') };
 
 #########################
 
