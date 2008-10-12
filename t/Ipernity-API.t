@@ -5,7 +5,9 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 1;
+use Test::More tests => 2;
+use lib ( 'blib/lib' );
+
 BEGIN { use_ok('Ipernity::API', 'Ipernity::API::Request') };
 
 #########################
@@ -19,5 +21,4 @@ my $api = Ipernity::API->new(
 my $result = $api->execute(
 	'method'        => 'test.hello',
 );
-
-exit 1 unless($result =~ m$<hello>hello world!</hello>$);
+ok($result->{_content} =~ m/hello world/, 'test.hello');
