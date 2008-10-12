@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Ipernity-API.t
+lib/Ipernity/API.pm
+lib/Ipernity/API/Request.pm

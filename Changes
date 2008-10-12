@@ -1,0 +1,6 @@
+Revision history for Perl extension Ipernity::API.
+
+0.01  Sun Oct 12 16:04:22 2008
+	- original version; created by h2xs 1.23 with options
+		-cfOn Ipernity::API
+
