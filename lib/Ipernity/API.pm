@@ -3,13 +3,14 @@
 # Contact: doomy [at] dokuleser [dot] org
 # Copyright 2008 Winfried Neessen
 #
-# $Id: API.pm,v 1.1 2008-10-12 14:07:56 doomy Exp $
-# Last modified: [ 2008-10-12 15:53:14 ]
+# $Id: API.pm,v 1.2 2008-10-12 17:38:00 doomy Exp $
+# Last modified: [ 2008-10-12 19:36:44 ]
 
 ### Module definitions {{{
 package Ipernity::API;
 use strict;
 use warnings;
+use Carp;
 use Digest::MD5 qw(md5_hex);
 use Ipernity::API::Request;
 use LWP::UserAgent;
@@ -129,8 +130,8 @@ sub fetchfrob
 
 	my $xml = XML::Twig->new(
 		TwigHandlers => {
+			"/api" => \&CheckError,
 			"/api/auth/frob" => sub { $frob = $_->text; },
-			"/rsp/err" => \&Pixlr::ApiError,
 		}
 	);
 	$xml->parse($response->{_content});
@@ -196,14 +197,36 @@ sub authtoken
 	### Process the respose
 	my $xml = XML::Twig->new(
 		TwigHandlers => {
+			"/api" => \&CheckError,
 			"/api/auth/token" => sub { $token = $_->text; },
-			"/rsp/err" => \&Pixlr::ApiError,
 		}
 	);
 	$xml->parse($response->{_content});
 
 	### Return the AuthToken
 	return $token;
+}
+# }}}
+
+### Check the API status code and return an error if unsuccessfull // CheckError() {{{
+sub CheckError
+{
+	### Get the API response
+	my ($t, $xml) = @_;
+
+	### Get the status;
+	my ($code, $msg);
+	my $status = $xml->{att}->{'status'};
+
+	### We caught an error - let's die!
+	if(lc($status) eq 'error') {
+		$code = $xml->{att}->{'code'};
+		$msg  = $xml->{att}->{'message'};
+		croak("An API call caught an unexpected error: " . $msg . " (Error Code: " . $code . ")");
+	}
+
+	### Everything is fine
+	return;
 }
 # }}}
 
@@ -271,6 +294,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$Id: API.pm,v 1.1 2008-10-12 14:07:56 doomy Exp $
+$Id: API.pm,v 1.2 2008-10-12 17:38:00 doomy Exp $
 
 =cut
