@@ -3,8 +3,8 @@
 # Contact: doomy [at] dokuleser [dot] org
 # Copyright 2008 Winfried Neessen
 #
-# $Id: API.pm,v 1.4 2008-10-14 19:16:32 doomy Exp $
-# Last modified: [ 2008-10-14 21:13:17 ]
+# $Id: API.pm,v 1.5 2008-10-14 19:40:27 doomy Exp $
+# Last modified: [ 2008-10-14 21:39:43 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -230,6 +230,12 @@ sub authtoken
 		'frob'	 => $frob,
 	);
 
+	### Let's safe the auth token and user information
+	$self->{auth}->{authtoken} = $response->{auth}->{token}->{content};
+	$self->{auth}->{realname}  = $response->{auth}->{user}->{realname};
+	$self->{auth}->{userid}    = $response->{auth}->{user}->{user_id};
+	$self->{auth}->{username}  = $response->{auth}->{user}->{username};
+
 	### Return the AuthToken
 	return $response->{auth}->{token}->{content};
 }
@@ -301,6 +307,17 @@ my $authurl = $api->authurl(
 
 my $token = $api->authtoken($frob);
 
+### After fetching the authtoken, all useful user information are
+### stored in the $api->{auth} section for later usage
+
+my $username  = $api->{auth}->{username};
+
+my $user_id   = $api->{auth}->{userid};
+
+my $realname  = $api->{auth}->{realname};
+
+my $authtoken = $api->{auth}->{authtoken};
+
 =back
 
 =head1 DESCRIPTION
@@ -333,6 +350,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$Id: API.pm,v 1.4 2008-10-14 19:16:32 doomy Exp $
+$Id: API.pm,v 1.5 2008-10-14 19:40:27 doomy Exp $
 
 =cut
