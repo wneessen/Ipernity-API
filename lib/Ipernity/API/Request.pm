@@ -3,8 +3,8 @@
 # Contact: doomy [at] dokuleser [dot] org
 # Copyright 2008 Winfried Neessen
 #
-# $Id: Request.pm,v 1.2 2008-10-14 19:16:32 doomy Exp $
-# Last modified: [ 2008-10-14 21:12:05 ]
+# $Id: Request.pm,v 1.3 2008-10-14 21:05:30 doomy Exp $
+# Last modified: [ 2008-10-14 23:04:48 ]
 
 ### Module definitions {{{
 package Ipernity::API::Request;
@@ -14,7 +14,7 @@ use HTTP::Request;
 use URI;
 
 our @ISA = qw(Ipernity::API HTTP::Request);
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 # }}}
 
 ### Module constructor {{{
@@ -110,6 +110,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$Id: Request.pm,v 1.2 2008-10-14 19:16:32 doomy Exp $
+$Id: Request.pm,v 1.3 2008-10-14 21:05:30 doomy Exp $
 
 =cut

@@ -3,8 +3,8 @@
 # Contact: doomy [at] dokuleser [dot] org
 # Copyright 2008 Winfried Neessen
 #
-# $Id: API.pm,v 1.5 2008-10-14 19:40:27 doomy Exp $
-# Last modified: [ 2008-10-14 21:39:43 ]
+# $Id: API.pm,v 1.6 2008-10-14 21:05:29 doomy Exp $
+# Last modified: [ 2008-10-14 23:04:34 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use XML::Simple;
 
 our @ISA = qw(LWP::UserAgent);
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 # }}}
 
 ### Module constructor / new() {{{
@@ -175,10 +175,6 @@ sub authurl
 	}
 	delete($args{perms});
 
-	### We need either a frob or a callback url
-	croak "Either a frob or a callback URL is needed"
-		unless(defined($args{frob}) or defined($args{callback}));
-
 	### Sort arguments and add them to $api_sig
 	foreach my $key (sort {$a cmp $b} keys %args) {
 		next unless(defined($args{$key}));
@@ -201,9 +197,6 @@ sub authurl
 	my $authurl = $url . qq(?api_key=) . $args{api_key};
 	if(defined($args{frob})) {
 		$authurl .= qq(&frob=) . $args{frob};
-	}
-	elsif(defined($args{callback})) {
-		#$authurl .= qq(&callback=) . $args{callback};
 	}
 	foreach my $permission (keys %args) {
 		$authurl .= qq(&) . $permission . qq(=) . $args{$permission} if($permission =~ /^perm_/);
@@ -350,6 +343,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$Id: API.pm,v 1.5 2008-10-14 19:40:27 doomy Exp $
+$Id: API.pm,v 1.6 2008-10-14 21:05:29 doomy Exp $
 
 =cut
