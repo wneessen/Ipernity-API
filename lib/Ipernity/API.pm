@@ -3,8 +3,8 @@
 # Contact: doomy [at] dokuleser [dot] org
 # Copyright 2008 Winfried Neessen
 #
-# $Id: API.pm,v 1.3 2008-10-12 19:11:33 doomy Exp $
-# Last modified: [ 2008-10-12 21:05:22 ]
+# $Id: API.pm,v 1.4 2008-10-14 19:16:32 doomy Exp $
+# Last modified: [ 2008-10-14 21:13:17 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use XML::Simple;
 
 our @ISA = qw(LWP::UserAgent);
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 # }}}
 
 ### Module constructor / new() {{{
@@ -67,31 +67,6 @@ sub execute
 }
 # }}}
 
-### Execute the API request / execute_request() {{{
-sub execute_request
-{
-	### Get object and request
-	my $self = shift;
-	my $request = shift;
-	$request->{_uri}->path($request->{_uri}->path() .  $request->{args}->{method} . '/' . $self->{args}->{outputformat} );
-
-	### Add API key and secret to the request
-	$request->{args}->{api_key} = $self->{args}->{api_key};
-	if($self->{args}->{secret}) {
-		$request->{args}->{api_sig} = $self->signargs($request->{args});
-	}
-
-	### Encode the arguments and build a POST request
-	$request->encode();
-
-	### Call the API
-	my $response = $self->request($request);
-
-	### Return the response
-	return $response;
-}
-# }}}
-
 ### Execute the API request and return a XML object / execute_xml() {{{
 sub execute_xml()
 {
@@ -114,6 +89,31 @@ sub execute_xml()
 
 	### Return the xmlhash
 	return $xmlresult;
+}
+# }}}
+
+### Execute the API request / execute_request() {{{
+sub execute_request
+{
+	### Get object and request
+	my $self = shift;
+	my $request = shift;
+	$request->{_uri}->path($request->{_uri}->path() .  $request->{args}->{method} . '/' . $self->{args}->{outputformat} );
+
+	### Add API key and secret to the request
+	$request->{args}->{api_key} = $self->{args}->{api_key};
+	if($self->{args}->{secret}) {
+		$request->{args}->{api_sig} = $self->signargs($request->{args});
+	}
+
+	### Encode the arguments and build a POST request
+	$request->encode();
+
+	### Call the API
+	my $response = $self->request($request);
+
+	### Return the response
+	return $response;
 }
 # }}}
 
@@ -165,20 +165,25 @@ sub authurl
 	my $self = shift;
 
 	### Fetch arguments
-	my (%args, $signed_args);
-	$args{frob}	= shift;
-	$args{perm_doc}	= shift;
+	my $signed_args;
+	my %args = @_;
 	$args{api_key}	= $self->{args}->{api_key};
 
-	### Set permissions to read if not set
-	unless(defined($args{perm_doc})) {
-		$args{perm_doc} = 'read';
+	### Lets put the permissions into the main hash
+	foreach my $permkey (%{$args{perms}}) {
+		$args{$permkey} = $args{perms}->{$permkey};
 	}
+	delete($args{perms});
+
+	### We need either a frob or a callback url
+	croak "Either a frob or a callback URL is needed"
+		unless(defined($args{frob}) or defined($args{callback}));
 
 	### Sort arguments and add them to $api_sig
 	foreach my $key (sort {$a cmp $b} keys %args) {
-		my $val = $args{$key} ? $args{$key} : '';
+		next unless(defined($args{$key}));
 		next if($key eq 'method');
+		my $val = $args{$key} ? $args{$key} : '';
 		$signed_args .= $key . $val;
 	}
 	if(defined($args{method})) {
@@ -193,7 +198,17 @@ sub authurl
 	my $url = qq(http://www.ipernity.com/apps/authorize);
 
 	### Build AuthURL
-	my $authurl = $url . qq(?api_key=) . $self->{args}->{api_key} . qq(&frob=) . $args{frob} . qq(&perm_doc=) . $args{perm_doc} . qq(&api_sig=) . $api_sig;
+	my $authurl = $url . qq(?api_key=) . $args{api_key};
+	if(defined($args{frob})) {
+		$authurl .= qq(&frob=) . $args{frob};
+	}
+	elsif(defined($args{callback})) {
+		#$authurl .= qq(&callback=) . $args{callback};
+	}
+	foreach my $permission (keys %args) {
+		$authurl .= qq(&) . $permission . qq(=) . $args{$permission} if($permission =~ /^perm_/);
+	}
+	$authurl .= qq(&api_sig=) . $api_sig;
 
 	### Return the URL
 	return $authurl;
@@ -207,12 +222,12 @@ sub authtoken
 	my $self = shift;
 
 	### Get arguments
-	$self->{frob} = shift;
+	my $frob = shift;
 
 	### Create an API request
 	my $response = $self->execute_xml(
 		'method' => 'auth.getToken',
-		'frob'	 => $self->{frob},
+		'frob'	 => $frob,
 	);
 
 	### Return the AuthToken
@@ -264,13 +279,25 @@ my $api = Ipernity::API->new(
    }
 );
 
-my $result = $api->execute(
+my $raw_response = $api->execute(
    'method'	=> 'test.hello',
+);
+
+my $hashref = $api->execute_xml(
+   'method'	=> 'test.hello',
+   'auth_token'	=> '12345-123-1234567890',
 );
 
 my $frob = $api->fetchfrob();
 
-my $authurl = $api->authurl($frob, 'read');
+my $authurl = $api->authurl(
+   'frob'	=> $frob,
+   'perms' => {
+       'perm_doc'	=> 'read',
+       'perm_network'	=> 'write',
+       'perm_blog'	=> 'delete',
+   },
+);
 
 my $token = $api->authtoken($frob);
 
@@ -306,6 +333,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$Id: API.pm,v 1.3 2008-10-12 19:11:33 doomy Exp $
+$Id: API.pm,v 1.4 2008-10-14 19:16:32 doomy Exp $
 
 =cut
