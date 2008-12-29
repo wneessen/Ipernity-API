@@ -4,3 +4,9 @@ Revision history for Perl extension Ipernity::API.
 	- original version; created by h2xs 1.23 with options
 		-cfOn Ipernity::API
 
+0.02  Mon Dec 29 20:46:09 2008 
+	- Removed 'args' part of the new() construct. It is important
+	  that you change your code to reflect this.
+	- Code cleanup
+	- Renamed execute_xml() to execute_hash()
+	- Cleaned up CheckResponse()

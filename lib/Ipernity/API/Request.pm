@@ -3,8 +3,8 @@
 # Contact: doomy [at] dokuleser [dot] org
 # Copyright 2008 Winfried Neessen
 #
-# $Id: Request.pm,v 1.3 2008-10-14 21:05:30 doomy Exp $
-# Last modified: [ 2008-10-14 23:04:48 ]
+# $Id: Request.pm,v 1.4 2008-12-29 19:49:19 doomy Exp $
+# Last modified: [ 2008-12-29 20:44:57 ]
 
 ### Module definitions {{{
 package Ipernity::API::Request;
@@ -14,7 +14,7 @@ use HTTP::Request;
 use URI;
 
 our @ISA = qw(Ipernity::API HTTP::Request);
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 # }}}
 
 ### Module constructor {{{
@@ -28,7 +28,7 @@ sub new
 	### Some static definitions
 	$self->method(qq(POST));
 	$self->uri(qq(http://api.ipernity.com/api/));
-	$self->header(qq(User-Agent) => qq(Ipernity::API v0.1));
+	$self->header(qq(User-Agent) => qq(Ipernity::API v0.2));
 
 	### Read arguments and assign them to my object
 	my %args = @_;
@@ -74,11 +74,11 @@ sub encode
 __END__
 =head1 NAME
 
-Ipernity::API::Request - Request object for Ipernity::API
+Ipernity::API::Request
 
 =head1 SYNOPSIS
 
-use Ipernity::API::Request
+To be invoked via Ipernity::API
 
 =head1 DESCRIPTION
 
@@ -90,26 +90,15 @@ Winfried Neessen, E<lt>doomy@dokuleser.org<gt>
 
 =head1 REQUIRES
 
-Perl 5, URI, HTTP::Request
+Perl 5, URI, HTTP::Request, XML::Simple, LWP::UserAgent, Digest::MD5
 
-=head1 COPYRIGHT and LICENCE
+=head1 BUGS
 
-Copyright (c) 2008, Winfried Neessen <doomy@dokuleser.org>
+Please report bugs in the CPAN bug tracker.
 
-Redistribution and use in source and binary forms, with or without
-modification, is not permitted.
+=head1 COPYRIGHT
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-$Id: Request.pm,v 1.3 2008-10-14 21:05:30 doomy Exp $
+Copyright (C) 2008 by Winfried Neessen. Published under the terms of the Artistic
+License 2.0.
 
 =cut

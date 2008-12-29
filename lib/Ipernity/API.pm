@@ -3,8 +3,8 @@
 # Contact: doomy [at] dokuleser [dot] org
 # Copyright 2008 Winfried Neessen
 #
-# $Id: API.pm,v 1.6 2008-10-14 21:05:29 doomy Exp $
-# Last modified: [ 2008-10-14 23:04:34 ]
+# $Id: API.pm,v 1.7 2008-12-29 19:49:19 doomy Exp $
+# Last modified: [ 2008-12-29 20:42:54 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use XML::Simple;
 
 our @ISA = qw(LWP::UserAgent);
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 # }}}
 
 ### Module constructor / new() {{{
@@ -28,9 +28,9 @@ sub new
 	my $self = new LWP::UserAgent;
 
 	### Read arguments and assign them to my object
-	my %args = @_;
-	foreach my $key (keys %args) {
-		$self->{$key} = $args{$key};
+	my $args = shift;
+	foreach my $key (keys %{$args}) {
+		$self->{args}->{$key} = $args->{$key};
 	}
 	
 	### For Ipernity we need an output format
@@ -67,12 +67,19 @@ sub execute
 }
 # }}}
 
-### Execute the API request and return a XML object / execute_xml() {{{
-sub execute_xml()
+### Execute the API request and return a XML object / execute_hash() {{{
+sub execute_hash()
 {
 	### Get object and request
 	my $self = shift;
 	my %args = @_;
+	my $oldformat;
+
+	### For XML output we need to force XML outputformat
+	if(lc($self->{args}->{outputformat}) ne 'xml') {
+		$oldformat = $self->{args}->{outputformat};
+		$self->{args}->{outputformat} = 'xml';
+	}
 
 	### Execute the request
 	my $response = $self->execute(%args)->{_content};
@@ -87,8 +94,20 @@ sub execute_xml()
 	### Check the status of the request
 	CheckResponse($xmlresult);
 
-	### Return the xmlhash
+	## Restore old outputformat
+	if(defined($oldformat)) {
+		$self->{args}->{outputformat} = $oldformat;
+	}
+
+	### Return the hash
 	return $xmlresult;
+}
+# }}}
+
+### Information placeholder for execute_xml / execute_xml() {{{
+sub execute_xml()
+{
+	return "execute_xml() has been renamed to execute_hash()";
 }
 # }}}
 
@@ -108,7 +127,7 @@ sub execute_request
 
 	### Encode the arguments and build a POST request
 	$request->encode();
-
+	
 	### Call the API
 	my $response = $self->request($request);
 
@@ -149,7 +168,7 @@ sub fetchfrob
 	my $frob = {};
 
 	### Create an API request
-	my $response = $self->execute_xml(
+	my $response = $self->execute_hash(
 		'method' => 'auth.getFrob',
 	);
 
@@ -218,7 +237,7 @@ sub authtoken
 	my $frob = shift;
 
 	### Create an API request
-	my $response = $self->execute_xml(
+	my $response = $self->execute_hash(
 		'method' => 'auth.getToken',
 		'frob'	 => $frob,
 	);
@@ -245,7 +264,7 @@ sub CheckResponse
 	my $status = $xmlhash->{'status'};
 
 	### We caught an error - let's die!
-	if(lc($status) eq 'error') {
+	if(lc($status) ne 'ok') {
 		$code = $xmlhash->{code};
 		$msg  = $xmlhash->{message};
 		croak("An API call caught an unexpected error: " . $msg . " (Error Code: " . $code . ")");
@@ -258,60 +277,50 @@ sub CheckResponse
 
 1;
 __END__
+
 =head1 NAME
 
 Ipernity::API - Perl interface to the Ipernity API
 
 =head1 SYNOPSIS
 
-use Ipernity::API
+	use Ipernity::API;
+	
+	my $api = Ipernity::API->new({
+		'api_key'	=> '12345678901234567890123456789012',
+		'secret'	=> '0123456789012345',
+		'outputformat'	=> 'xml',
+	});
 
-=head1 USAGE
+	my $raw_response = $api->execute(
+		'method'	=> 'test.hello',
+	);
 
-use Ipernity::API;
+	my $hash = $api->execute_hash(
+		'method'	=> 'test.hello',
+		'auth_token'	=> '12345-123-1234567890',
+	);
+	
+	my $frob = $api->fetchfrob();
 
-my $api = Ipernity::API->new(
-   'args'   => {
-      'api_key'      => '12345678901234567890123456789012',
-      'secret'       => '0123456789012345',
-      'outputformat' => 'xml',
-   }
-);
+	my $authurl = $api->authurl(
+		'frob'		=> $frob,
+		'perms'		=> {
+			'perm_doc'	=> 'read',
+			'perm_network'	=> 'write',
+			'perm_blog'	=> 'delete',
+		},
+	};
 
-my $raw_response = $api->execute(
-   'method'	=> 'test.hello',
-);
+	my $token = $api->authtoken( $frob );
 
-my $hashref = $api->execute_xml(
-   'method'	=> 'test.hello',
-   'auth_token'	=> '12345-123-1234567890',
-);
+	### After fetching the authtoken, all useful user information are
+	### stored in the $api->{auth} section for later usage
 
-my $frob = $api->fetchfrob();
-
-my $authurl = $api->authurl(
-   'frob'	=> $frob,
-   'perms' => {
-       'perm_doc'	=> 'read',
-       'perm_network'	=> 'write',
-       'perm_blog'	=> 'delete',
-   },
-);
-
-my $token = $api->authtoken($frob);
-
-### After fetching the authtoken, all useful user information are
-### stored in the $api->{auth} section for later usage
-
-my $username  = $api->{auth}->{username};
-
-my $user_id   = $api->{auth}->{userid};
-
-my $realname  = $api->{auth}->{realname};
-
-my $authtoken = $api->{auth}->{authtoken};
-
-=back
+	my $username  = $api->{auth}->{username};
+	my $user_id   = $api->{auth}->{userid};
+	my $realname  = $api->{auth}->{realname};
+	my $authtoken = $api->{auth}->{authtoken};
 
 =head1 DESCRIPTION
 
@@ -323,26 +332,15 @@ Winfried Neessen, E<lt>doomy@dokuleser.org<gt>
 
 =head1 REQUIRES
 
-Perl 5, URI, HTTP::Request, XML::Twig, LWP::UserAgent, Digest::MD5
+Perl 5, URI, HTTP::Request, XML::Simple, LWP::UserAgent, Digest::MD5
 
-=head1 COPYRIGHT and LICENCE
+=head1 BUGS
 
-Copyright (c) 2008, Winfried Neessen <doomy@dokuleser.org>
+Please report bugs in the CPAN bug tracker.
 
-Redistribution and use in source and binary forms, with or without
-modification, is not permitted.
+=head1 COPYRIGHT
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-$Id: API.pm,v 1.6 2008-10-14 21:05:29 doomy Exp $
+Copyright (C) 2008 by Winfried Neessen. Published under the terms of the Artistic
+License 2.0.
 
 =cut
