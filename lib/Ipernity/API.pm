@@ -3,8 +3,8 @@
 # Contact: doomy [at] dokuleser [dot] org
 # Copyright 2008 Winfried Neessen
 #
-# $Id: API.pm,v 1.7 2008-12-29 19:49:19 doomy Exp $
-# Last modified: [ 2008-12-29 20:42:54 ]
+# $Id$
+# Last modified: [ 2010-09-28 11:13:12 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use XML::Simple;
 
 our @ISA = qw(LWP::UserAgent);
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 # }}}
 
 ### Module constructor / new() {{{
@@ -88,7 +88,8 @@ sub execute_hash()
 	my $xml = new XML::Simple;
 	my $xmlresult = $xml->XMLin(
 		$response, 
-		ForceContent => 1
+		ForceContent => 1,
+		ForceArray   => 1,
 	);
 
 	### Check the status of the request
