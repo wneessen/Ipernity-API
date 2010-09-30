@@ -4,7 +4,7 @@
 # Copyright 2008 Winfried Neessen
 #
 # $Id$
-# Last modified: [ 2010-09-28 11:13:12 ]
+# Last modified: [ 2010-09-30 15:54:48 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -325,7 +325,54 @@ Ipernity::API - Perl interface to the Ipernity API
 
 =head1 DESCRIPTION
 
-To be done.
+Ipernity::API is a full implementation of the Ipernity API interface. It uses
+LWP::UserAgent to communicate with the API and returns the results in the 3
+possible formats (provided by Ipernity): JSON, XML, SOAP, XML-RPC
+
+=head1 METHODS
+
+=over 4
+
+=item B<new>( configuration hash )
+
+The constructor takes a hashref with all needed configuration values as argument.
+B<api_key> and B<secret> are mandatory values. The B<outputformat> is option and
+will be set to XML if not defined.
+
+=item B<fetchfrob>()
+
+This method fetches a frob from Ipernity, which later can be used to generate and
+authentication URL and an AuthToken
+
+=item B<authurl>( config hash )
+
+Generates an authentication URL which can be provided to the user. This is needed
+so that the user can confirm that he grants permissions to the script. This method
+requires a B<frob> and a B<perms> parameter to be set.
+
+=item B<authtoken>( frob )
+
+Will fetch the AuthToken from Ipernity for later usage (for authenticated API calls).
+This method requires a valid frob to be provided as argument.
+
+=item B<execute>( ipernity parameters )
+
+Calling this method will execute the provided method together with its options on
+the Ipernity API. As result the method returns the raw answer from the API so that
+the script can take care of parsing the output from Ipernity on its own
+
+=item B<execute_hash>( ipernity parameters )
+
+Works similar to B<execute>() but returns a hashref for easy access to the results
+from Ipernity
+
+=back
+
+=head1 CAVEATS
+
+Since version 0.07 the execute_hash() function always returns arrays, even
+if the XML result would be only one. Please not that you might have to adjust
+your code, in case you are upgradeing to v0.07 (which is highly recommended)
 
 =head1 AUTHOR
 
@@ -341,7 +388,29 @@ Please report bugs in the CPAN bug tracker.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2008 by Winfried Neessen. Published under the terms of the Artistic
-License 2.0.
+Copyright (c) 2008-2010, Winfried Neessen <doomy@dokuleser.org>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the neessen.net nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
