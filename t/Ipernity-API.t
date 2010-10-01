@@ -19,4 +19,4 @@ my $api = Ipernity::API->new({
 my $result = $api->execute_hash(
 	'method'        => 'test.hello',
 );
-ok($result->{hello}->{content} =~ m/hello world/, 'test.hello');
+ok($result->{hello}->[0]->{content} =~ m/hello world/, 'test.hello');
