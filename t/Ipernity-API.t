@@ -12,13 +12,11 @@ BEGIN { use_ok('Ipernity::API') };
 
 #########################
 
-my $api = Ipernity::API->new(
-	'args'          => {
-		'api_key'       => '76704c8b0000271B6df755a656250e26',
-		'outputformat'  => 'xml',
-	},
-);
-my $result = $api->execute_xml(
+my $api = Ipernity::API->new({
+	'api_key'       => '76704c8b0000271B6df755a656250e26',
+	'outputformat'  => 'xml',
+});
+my $result = $api->execute_hash(
 	'method'        => 'test.hello',
 );
 ok($result->{hello}->{content} =~ m/hello world/, 'test.hello');
