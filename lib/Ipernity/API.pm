@@ -4,7 +4,7 @@
 # Copyright 2008 Winfried Neessen
 #
 # $Id$
-# Last modified: [ 2010-12-05 14:28:09 ]
+# Last modified: [ 2010-12-05 14:32:21 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -244,13 +244,13 @@ sub authtoken
 	);
 
 	### Let's safe the auth token and user information
-	$self->{auth}->{authtoken} = $response->{auth}->{token}->{content};
-	$self->{auth}->{realname}  = $response->{auth}->{user}->{realname};
-	$self->{auth}->{userid}    = $response->{auth}->{user}->{user_id};
-	$self->{auth}->{username}  = $response->{auth}->{user}->{username};
+	$self->{auth}->{authtoken} = $response->{auth}->[0]->{token}->[0]->{content};
+	$self->{auth}->{realname}  = $response->{auth}->[0]->{user}->[0]->{realname};
+	$self->{auth}->{userid}    = $response->{auth}->[0]->{user}->[0]->{user_id};
+	$self->{auth}->{username}  = $response->{auth}->[0]->{user}->[0]->{username};
 
 	### Return the AuthToken
-	return $response->{auth}->{token}->{content};
+	return $response->{auth}->[0]->{token}->[0]->{content};
 }
 # }}}
 
