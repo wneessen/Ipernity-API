@@ -4,7 +4,7 @@
 # Copyright 2008 Winfried Neessen
 #
 # $Id$
-# Last modified: [ 2010-09-30 15:54:48 ]
+# Last modified: [ 2010-12-05 14:28:09 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use XML::Simple;
 
 our @ISA = qw(LWP::UserAgent);
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 # }}}
 
 ### Module constructor / new() {{{
@@ -174,7 +174,7 @@ sub fetchfrob
 	);
 
 	### Return the frob
-	return $response->{auth}->{frob}->{content};
+	return $response->{auth}->[0]->{frob}->[0]->{content};
 }
 # }}}
 
