@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl -wT
 # Iperntiy::API test suite
 #
 # Contact: doomy [at] dokuleser [dot] org
@@ -7,9 +7,10 @@
 # $Id$
 # Last modified: [ 2010-12-05 14:32:21 ]
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 use lib ( 'blib/lib', 'lib/', 'lib/Ipernity' );
 use Ipernity::API;
+use IO::Socket::INET;
 
 ## Define Ipernity::API object {{{
 my $api = Ipernity::API->new(
@@ -25,17 +26,23 @@ ok( defined( $api ), 'Ipernity::API object successfully created' );
 ok( $api->isa( 'Ipernity::API' ), 'Object is an Ipernity::API object' );
 # }}}
 
-## Execute API call (skip if user doesn't have internet connectivity) {{{
-print "\nIpernity::API would like to execute an API call. This requires internet connectivity.\n";
-print "Would you like to run this test now? (Y/N) [n]: ";
-my $runit = <STDIN>;
-chomp( $runit );
-print "\n";
+## Check for internet connectivity {{{
+pass( 'Checking if internet connectivity is given' );
+my $inet = IO::Socket::INET->new(
+	'PeerAddr'	=> 'www.google.com:80',
+	'Timeout'	=> 3,
+	'Proto'		=> 'tcp',
+);
+# }}}
 
+## Execute API call (skip if user doesn't have internet connectivity) {{{
 SKIP: {
 
 	## Define skip condition
-	skip( '// User requested to skil API call', 3 ) if( defined( $runit ) and lc( $runit ) ne 'y' );
+	skip( '// Not internet connectivity given', 4 ) unless( defined( $inet ) and $inet );
+
+	## If connectivity is given, we can close the FH now
+	pass( 'Internet connectivity is given' );
 
 	## Send test.hello API call {{{
 	my $hello = $api->execute_hash(
