@@ -20,3 +20,4 @@ Revision history for Perl extension Ipernity::API.
 	- new() now takes single arguments instead of a hashref
 	- Better test suite
 	- Documentation cleanup
+	- Better- more useful Makefile.PL
