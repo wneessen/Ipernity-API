@@ -4,7 +4,7 @@
 # Copyright 2008 Winfried Neessen
 #
 # $Id$
-# Last modified: [ 2011-01-05 15:05:35 ]
+# Last modified: [ 2011-01-05 21:21:42 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -343,8 +343,8 @@ sub CheckResponse
 	{
 		
 		## Get code and message of the error
-		$code = $xmlhash->[0]->{ 'code' };
-		$msg  = $xmlhash->[0]->{ 'message' };
+		$code = $xmlhash->{ 'code' };
+		$msg  = $xmlhash->{ 'message' };
 
 		## Croak the error
 		croak( 'An API call caught an unexpected error: ' . $msg . ' (Error Code: ' . $code . ')' );
