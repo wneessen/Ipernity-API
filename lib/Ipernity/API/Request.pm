@@ -4,7 +4,7 @@
 # Copyright 2008 Winfried Neessen
 #
 # $Id$
-# Last modified: [ 2011-01-05 12:33:50 ]
+# Last modified: [ 2011-01-05 15:01:53 ]
 
 ### Module definitions {{{
 package Ipernity::API::Request;
@@ -14,7 +14,7 @@ use HTTP::Request;
 use URI;
 
 our @ISA = qw(Ipernity::API HTTP::Request);
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 # }}}
 
 ### Module constructor {{{

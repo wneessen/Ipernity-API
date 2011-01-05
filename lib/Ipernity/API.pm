@@ -4,7 +4,7 @@
 # Copyright 2008 Winfried Neessen
 #
 # $Id$
-# Last modified: [ 2011-01-05 14:41:49 ]
+# Last modified: [ 2011-01-05 15:01:36 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -464,9 +464,9 @@ Since version 0.07 the execute_hash() function always returns arrays, even
 if the XML result would be only one. Please not that you might have to adjust
 your code, in case you are upgradeing to v0.07 (which is highly recommended).
 
-Starting with verseion 0.08 the new() constructor doesn't accept a hashref of
+Starting with verseion 0.09 the new() constructor doesn't accept a hashref of
 configuration parameters anymore, but will now require the single key/value
-pairs provided to the constructor directly. If you are upgrading to 0.08 you
+pairs provided to the constructor directly. If you are upgrading to 0.09 you
 will have to adjust your code, so that will with work with newer setup.
 
 =head1 AUTHOR
