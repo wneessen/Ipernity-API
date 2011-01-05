@@ -14,10 +14,10 @@ use IO::Socket::INET;
 
 ## Define Ipernity::API object {{{
 my $api = Ipernity::API->new(
-	{
-		'api_key'	=> '76704c8b0000271B6df755a656250e26',
-		'outputformat'	=> 'xml',
-	}
+
+	'api_key'	=> '76704c8b0000271B6df755a656250e26',
+	'outputformat'	=> 'xml',
+
 );
 # }}}
 
@@ -29,9 +29,11 @@ ok( $api->isa( 'Ipernity::API' ), 'Object is an Ipernity::API object' );
 ## Check for internet connectivity {{{
 pass( 'Checking if internet connectivity is given' );
 my $inet = IO::Socket::INET->new(
+
 	'PeerAddr'	=> 'www.google.com:80',
 	'Timeout'	=> 3,
 	'Proto'		=> 'tcp',
+
 );
 # }}}
 
@@ -46,7 +48,9 @@ SKIP: {
 
 	## Send test.hello API call {{{
 	my $hello = $api->execute_hash(
+
 		'method'	=> 'test.hello',
+
 	);
 	# }}}
 

@@ -4,7 +4,7 @@
 # Copyright 2008 Winfried Neessen
 #
 # $Id$
-# Last modified: [ 2010-09-28 11:13:35 ]
+# Last modified: [ 2011-01-05 12:33:50 ]
 
 ### Module definitions {{{
 package Ipernity::API::Request;
@@ -14,34 +14,40 @@ use HTTP::Request;
 use URI;
 
 our @ISA = qw(Ipernity::API HTTP::Request);
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 # }}}
 
 ### Module constructor {{{
 sub new
 {
-	### Define class and object
-	my $class = shift;
+
+	### Define class and object and read arguments
+	my ( $class, %args ) = @_;
 	my $self = new HTTP::Request;
-	$self->{api_sig} = {};
+
+	## Initalize placeholder for API signature
+	$self->{ 'api_sig' } = {};
 
 	### Some static definitions
-	$self->method(qq(POST));
-	$self->uri(qq(http://api.ipernity.com/api/));
-	$self->header(qq(User-Agent) => qq(Ipernity::API v0.2));
+	$self->method( 'POST' );
+	$self->uri( 'http://api.ipernity.com/api/' );
+	$self->header( 'User-Agent' => 'Ipernity::API v' . $Ipernity::API::VERSION );
 
-	### Read arguments and assign them to my object
-	my %args = @_;
-	foreach my $key (keys %args) {
-		$self->{args}->{$key} = $args{$key};
+	### Assign arguments to my object
+	foreach my $key ( keys %args )
+	{
+
+		$self->{ 'args' }->{ $key } = $args{ $key };
+
 	}
 	
 	### We need a method to call at least!
-	warn qq(Please provide at least a calling method) unless ($self->{args}->{method});
+	warn 'Please provide at least a calling method' unless( defined( $self->{ 'args' }->{ 'method' } ) );
 
 	### Reference object to class
 	bless $self, $class;
 	return $self;
+
 }
 # }}}
 
@@ -52,20 +58,24 @@ sub encode
 	my $self = shift;
 
 	### Build an URI object
-	my $uri = URI->new(qq(http:));
+	my $uri = URI->new( 'http:' );
 
 	### Build an HTTP valid request URI
-	delete($self->{args}->{method});
-	$uri->query_form($self->{args});
+	delete( $self->{ 'args' }->{ 'method' } );
+	$uri->query_form( $self->{ 'args' } );
 	my $content = $uri->query;
-	my $length = length($content);
+	my $length = length( $content );
 
 	### Add POST fields to HTTP header
-	$self->header(qq(Content-Type) => qq(application/x-www-form-urlencoded));
-	if($content) {
-		$self->header(qq(Content-Length) => $length);
-		$self->content($content);
+	$self->header( 'Content-Type' => 'application/x-www-form-urlencoded' );
+	if( defined( $content ) )
+	{
+
+		$self->header( 'Content-Length' => $length );
+		$self->content( $content );
+
 	}
+
 }
 # }}}
 

@@ -13,10 +13,10 @@ use Ipernity::API;
 
 ## Define Ipernity::API object {{{
 my $api = Ipernity::API->new(
-	{
-		'api_key'	=> '76704c8b0000271B6df755a656250e26',
-		'outputformat'	=> 'xml',
-	}
+
+	'api_key'	=> '76704c8b0000271B6df755a656250e26',
+	'outputformat'	=> 'xml',
+
 );
 # }}}
 
