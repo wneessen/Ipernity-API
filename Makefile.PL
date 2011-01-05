@@ -6,13 +6,13 @@ WriteMakefile(
     NAME              => 'Ipernity::API',
     VERSION_FROM      => 'lib/Ipernity/API.pm', # finds $VERSION
     PREREQ_PM         => {
-	    'URI'		=> 0,
-	    'HTTP::Request'	=> 0,
-	    'XML::Simple'	=> 0,
-	    'LWP::UserAgent'	=> 0,
-	    'Digest::MD5'	=> 0,
+	    'URI'		=> 1.55,
+	    'HTTP::Request'	=> 5.827,
+	    'XML::Simple'	=> 2.18,
+	    'LWP::UserAgent'	=> 5.829,
+	    'Digest::MD5'	=> 2.36,
     },
-    PREREQ_FATAL      => 1,
+    PREREQ_FATAL      => 0,
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Ipernity/API.pm', # retrieve abstract from module
        AUTHOR         => 'Winfried Neessen <doomy@dokuleser.org>') : ()),
