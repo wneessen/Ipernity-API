@@ -4,7 +4,7 @@
 # Copyright 2008 Winfried Neessen
 #
 # $Id$
-# Last modified: [ 2011-01-05 15:01:36 ]
+# Last modified: [ 2011-01-05 15:05:35 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -468,6 +468,11 @@ Starting with verseion 0.09 the new() constructor doesn't accept a hashref of
 configuration parameters anymore, but will now require the single key/value
 pairs provided to the constructor directly. If you are upgrading to 0.09 you
 will have to adjust your code, so that will with work with newer setup.
+
+=head1 DEVELOPMENT
+
+The latest (development) version of Ipernity::API is always available via GIT
+at: http://nop.li/ipernityapi
 
 =head1 AUTHOR
 
