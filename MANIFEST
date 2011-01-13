@@ -4,5 +4,7 @@ MANIFEST
 README
 t/1_create-object.t
 t/2_hello-world.t
+t/3_frob.t
+t/4_authurl.t
 lib/Ipernity/API.pm
 lib/Ipernity/API/Request.pm
