@@ -21,3 +21,7 @@ Revision history for Perl extension Ipernity::API.
 	- Better test suite
 	- Documentation cleanup
 	- Better- more useful Makefile.PL
+
+0.10  Thu Jan 13 13:26:10 2011
+	- Fixed major bug in authtoken() function which caused
+	  this function to break
