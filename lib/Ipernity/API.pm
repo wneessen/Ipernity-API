@@ -4,7 +4,7 @@
 # Copyright 2008 Winfried Neessen
 #
 # $Id$
-# Last modified: [ 2011-01-05 21:21:42 ]
+# Last modified: [ 2011-01-13 12:32:46 ]
 
 ### Module definitions {{{
 package Ipernity::API;
@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use XML::Simple;
 
 our @ISA = qw(LWP::UserAgent);
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 # }}}
 
 ### Module constructor / new() {{{
@@ -321,7 +321,7 @@ sub authtoken
 	$self->{ 'auth' }->{ 'username' }  = $response->{ 'auth' }->[0]->{ 'user' }->[0]->{ 'username' };
 
 	### Return the AuthToken
-	return $response->{ 'auth' }->[0]->{ 'token' }->[0]->{ 'content '};
+	return $response->{ 'auth' }->[0]->{ 'token' }->[0]->{ 'content' };
 
 }
 # }}}
